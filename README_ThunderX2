@@ -9,7 +9,7 @@ A modified version to get desired results is stored in github repository mention
 
 Building Redis
 ---------------
-	$ cd cavium_redis-4.0.11.git/
+	$ cd cavium_redis-4.0.11
 	$ make distclean
 	$ make -j
 
@@ -24,10 +24,12 @@ Running Redis Benchark Tests
   ----------------
 	The following command starts Redis-Client.
 
-	$ bash redis_client.sh -s [SERVER_IP]
+	$ bash redis_client.sh [-h] [-s <SERVER_IP>] [-n <requests>] [-P <num requests>]
 
-	It will bind the Redis Clients to specific SERVER_IP. By default it binds to LOCALHOST (127.0.0.1).
-	If required, please check for help with -h option.
+		-h  show this help text
+		-s  set the server IP value. Default: 127.0.0.1
+		-n  set the number of requests. Default 1000000
+		-P  Pipeline <numreq> requests. Default 1 (no pipeline)
 
 > Results
   -------
