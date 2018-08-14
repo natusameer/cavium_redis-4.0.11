@@ -1,0 +1,42 @@
+This README is a reference document to run REDIS benchmark tests over ThunderX2 machine.
+
+Source Code
+-----------
+Redis Stable Version (Label 4.0.11) is used to run Redis Server/Client tests.
+A modified version to get desired results is stored in github repository mentioned below
+
+	$ git clone https://github.com/natusameer/cavium_redis-4.0.11.git
+
+Building Redis
+---------------
+	$ cd cavium_redis-4.0.11.git/
+	$ make distclean
+	$ make -j
+
+Running Redis Benchark Tests
+-----------------------------
+> For Redis-Server
+  ----------------
+	The following command starts Redis-Server with 256 Instances
+	$ bash redis_server.sh
+
+> For Redis-Client
+  ----------------
+	The following command starts Redis-Client.
+
+	$ bash redis_client.sh -s [SERVER_IP]
+
+	It will bind the Redis Clients to specific SERVER_IP. By default it binds to LOCALHOST (127.0.0.1).
+	If required, please check for help with -h option.
+
+> Results
+  -------
+	Results will be stored in CSV format.
+	e.g. for 256 Server/Client instances, results will be stored in "results_256.csv"
+
+
+At the end of test, kill the Redis server.
+	$ sudo killall redis-server
+
+
+NOTE: For any troubleshooting, also refer README.md
