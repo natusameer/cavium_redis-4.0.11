@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <math.h>
 #include <time.h>
 #include <sys/time.h>
 #include <signal.h>
@@ -431,8 +432,23 @@ static int compareLatency(const void *a, const void *b) {
 static void showLatencyReport(void) {
     int i, curlat = 0;
     float perc, reqpersec;
+    int flag=0;
+    int perc_latency[5]={0,0,0,0,0};
+    float perc_val[5]={50,95,99,99.9,99.99};
 
     reqpersec = (float)config.requests_finished/((float)config.totlatency/1000);
+    qsort(config.latency,config.requests,sizeof(long long),compareLatency);
+	for (i = 0; i < config.requests; i++) {
+		perc = ((float)(i+1)*100.0)/(float)config.requests;
+
+		if (((perc == 50) && (flag==0)) || ((perc == 95)&& (flag==1)) || ((perc == 99.00)&& (flag==2)) || (((perc > 99.9000) && (perc < 99.901))&& (flag==3)) || (((perc > 99.9890) && (perc < 99.999))&& (flag==4))) {
+			curlat = config.latency[i]/1000;
+			perc = ((float)(i+1)*100)/config.requests;
+			perc_latency[flag]=curlat;
+			flag++;
+		}
+	}
+
     if (!config.quiet && !config.csv) {
         printf("====== %s ======\n", config.title);
         printf("  %d requests completed in %.2f seconds\n", config.requests_finished,
@@ -442,17 +458,12 @@ static void showLatencyReport(void) {
         printf("  keep alive: %d\n", config.keepalive);
         printf("\n");
 
-        qsort(config.latency,config.requests,sizeof(long long),compareLatency);
-        for (i = 0; i < config.requests; i++) {
-            if (config.latency[i]/1000 != curlat || i == (config.requests-1)) {
-                curlat = config.latency[i]/1000;
-                perc = ((float)(i+1)*100)/config.requests;
-                printf("%.2f%% <= %d milliseconds\n", perc, curlat);
-            }
-        }
+	for (i=0; i<5; i++) {
+		printf("%.2f%% <= %d milliseconds\n", perc_val[i], perc_latency[i]);
+	}
         printf("%.2f requests per second\n\n", reqpersec);
     } else if (config.csv) {
-        printf("\"%s\",\"%.2f\"\n", config.title, reqpersec);
+        printf("\"%s\",\"%.2f\",\"%d\",\"%d\",\"%d\",\"%d\",\"%d\"\n", config.title, reqpersec, perc_latency[0], perc_latency[1], perc_latency[2], perc_latency[3], perc_latency[4]);
     } else {
         printf("%s: %.2f requests per second\n", config.title, reqpersec);
     }
