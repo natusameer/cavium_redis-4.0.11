@@ -17,21 +17,25 @@ Running Redis Benchark Tests
 -----------------------------
 > Automated Script
   ----------------
-	bench.sh is an automated script to run Redis Server and Client.
+	bench.sh is an automated script to run Redis Server and Client on LOCALHOST
 
-	$ bash bench.sh [-h] [-s <SERVER_IP>] [-n <requests>] [-P <num requests>]
+	$ bash bench.sh [-h] [-n <requests>] [-P <num requests>]
 
 		-h  show this help text
-		-s  set the server IP value. Default: 127.0.0.1
 		-n  set the number of requests. Default 1000000
 		-P  Pipeline <numreq> requests. Default 1 (no pipeline)
 
 	Results will be stored in csv format. e.g. results_64.csv
 
+NOTE: If Redis Server and Client has to run on Seperate Machines, then it has to be run individually.
+
 > For Redis-Server
   ----------------
 	The following command starts Redis-Server with 256 Instances
-	$ bash redis_server.sh
+	$ bash redis_server.sh [-h] [-I <Client Instances>]
+
+		-h  show this help text
+		-I  Set number of Client instances. Default 512
 
 > For Redis-Client
   ----------------

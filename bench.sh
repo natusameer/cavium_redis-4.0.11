@@ -1,9 +1,8 @@
 #!/bin/bash
-usage="$(basename "$0") [-h] [-s <SERVER_IP>] [-n <requests>] [-P <num requests>]  -- Program to run Redis Client.
+usage="$(basename "$0") [-h] [-n <requests>] [-P <num requests>]  -- Program to run Redis Client.
 
 where:
 -h  show this help text
--s  set the server IP value. Default: 127.0.0.1
 -n  set the number of requests. Default 1000000
 -P  Pipeline <numreq> requests. Default 1 (no pipeline)"
 
@@ -15,8 +14,6 @@ while getopts ':hs:n:P:I:' option; do
 	case "$option" in
 		h) echo "$usage"
 			exit
-			;;
-		s) SERVER_IP=$OPTARG
 			;;
 		n) REQUESTS=$OPTARG
 			;;

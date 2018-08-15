@@ -3,11 +3,11 @@ usage="$(basename "$0") [-h] [-I <Client Instances>] -- Program to run Redis Cli
 
 where:
 -h  show this help text
--I  Set number of Client instances. Default 64"
+-I  Set number of Client instances. Default 512"
 
 #DEFAULT SERVER_IP
 SERVER_IP="0.0.0.0"
-NUMINSTANCES=64
+NUMINSTANCES=512
 while getopts ':hI:' option; do
 	case "$option" in
 		h) echo "$usage"
