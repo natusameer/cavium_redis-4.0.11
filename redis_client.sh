@@ -1,17 +1,19 @@
 #!/bin/bash
-usage="$(basename "$0") [-h] [-s <SERVER_IP>] [-n <requests>] [-P <num requests>] -- Program to run Redis Client.
+usage="$(basename "$0") [-h] [-s <SERVER_IP>] [-n <requests>] [-P <num requests>] [-I <Client Instances>] -- Program to run Redis Client.
 
 where:
 -h  show this help text
 -s  set the server IP value. Default: 127.0.0.1
 -n  set the number of requests. Default 1000000
--P  Pipeline <numreq> requests. Default 1 (no pipeline)"
+-P  Pipeline <numreq> requests. Default 1 (no pipeline)
+-I  Set number of Client instances. Default 64"
 
 #DEFAULT SERVER_IP
 SERVER_IP="127.0.0.1"
 REQUESTS=1000000
 NUMREQUESTS=1
-while getopts ':hs:n:P:' option; do
+NUMINSTANCES=64
+while getopts ':hs:n:P:I:' option; do
 	case "$option" in
 		h) echo "$usage"
 			exit
@@ -21,6 +23,8 @@ while getopts ':hs:n:P:' option; do
 		n) REQUESTS=$OPTARG
 			;;
 		P) NUMREQUESTS=$OPTARG
+			;;
+		I) NUMINSTANCES=$OPTARG
 			;;
 		:) printf "missing argument for -%s\n" "$OPTARG" >&2
 			echo "$usage" >&2
@@ -36,8 +40,6 @@ shift $((OPTIND - 1))
 
 PHY_CPUS=`lscpu | grep ^Core | tr -s ' ' | cut -d" " -f4`; echo ${PHY_CPUS}
 SMT=`lscpu | grep Thread | tr -s ' ' | cut -d" " -f4`;
-MIN=64
-MAX=128
 DIVISOR=`echo $(($(($SMT*$PHY_CPUS))*2))`
 
 
@@ -56,23 +58,20 @@ fi
 sudo rm -f /tmp/redis_*
 
 #Run Client
-for ((j=$MIN; $j<=$MAX; j=$j<<1)); do
-	echo "Redis Test with Client-Server $j instances"
-	for ((i=0;$i<$j;i=$i+1)); do
-		let cpu=$((${i}%${DIVISOR}))
+echo "Redis Test with Client-Server $NUMINSTANCES instances"
+for ((i=0;$i<$NUMINSTANCES;i=$i+1)); do
+	let cpu=$((${i}%${DIVISOR}))
 
-		#cmd="taskset -c $cpu ./src/redis-benchmark -h ${SERVER_IP} -p $((6379+$i)) -n $REQUESTS -P $NUMREQUESTS -c $i --csv > /tmp/redis_${i} &"
-		cmd="taskset -c $cpu ./src/redis-benchmark -h ${SERVER_IP} -p $((6379+$i)) -n $REQUESTS -P $NUMREQUESTS --csv > /tmp/redis_${i} &"
-		echo $cmd
-		eval $cmd
-	done
-
-	pidnum=`pidof redis-benchmark`
-	for k in $pidnum; do
-		wait $k
-	done
-	sleep 10
-	bash get_results.sh results_${j}.csv
+	cmd="taskset -c $cpu ./src/redis-benchmark -h ${SERVER_IP} -p $((6379+$i)) -n $REQUESTS -P $NUMREQUESTS --csv > /tmp/redis_${i} &"
+	echo $cmd
+	eval $cmd
 done
+
+pidnum=`pidof redis-benchmark`
+for k in $pidnum; do
+	wait $k
+done
+sleep 10
+bash get_results.sh results_${NUMINSTANCES}.csv
 
 sleep 5

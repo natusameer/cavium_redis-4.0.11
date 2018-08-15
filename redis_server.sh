@@ -1,17 +1,20 @@
 #!/bin/bash
-usage="$(basename "$0") [-h] -- Program to run Redis Client.
+usage="$(basename "$0") [-h] [-I <Client Instances>] -- Program to run Redis Client.
 
 where:
--h  show this help text"
+-h  show this help text
+-I  Set number of Client instances. Default 64"
 
 #DEFAULT SERVER_IP
 SERVER_IP="0.0.0.0"
-
-while getopts ':h' option; do
+NUMINSTANCES=64
+while getopts ':hI:' option; do
 	case "$option" in
 		h) echo "$usage"
 			exit
 			;;
+		I) NUMINSTANCES=$OPTARG
+			;;	
 		\?) printf "illegal option: -%s\n" "$OPTARG" >&2
 			echo "$usage" >&2
 			exit 1
@@ -23,7 +26,6 @@ shift $((OPTIND - 1))
 PHY_CPUS=`lscpu | grep ^Core | tr -s ' ' | cut -d" " -f4`; echo ${PHY_CPUS}
 SMT=`lscpu | grep Thread | tr -s ' ' | cut -d" " -f4`;
 
-MAX=256
 #MODE="DUAL_SOCK"
 DIVISOR=`echo $(($(($SMT*$PHY_CPUS))*2))`
 
@@ -52,7 +54,7 @@ if pgrep redis-server; then
 fi
 
 #Run Server
-for ((i=0;$i<$MAX;i=$i+1));
+for ((i=0;$i<$NUMINSTANCES;i=$i+1));
 do
 	let cpu=$((${i}%${DIVISOR}))
 
