@@ -41,13 +41,15 @@ NOTE: If Redis Server and Client has to run on Seperate Machines, then it has to
   ----------------
 	The following command starts Redis-Client.
 
-	$ bash redis_client.sh [-h] [-s <SERVER_IP>] [-n <requests>] [-P <num requests>] [-I <Client Instances>]
+	$ bash redis_client.sh [-h] [-s <SERVER_IP>] [-n <requests>] [-P <num requests>] [-I <Client Instances>] [-S < Output Summary >]
+
 
 		-h  show this help text
 		-s  set the server IP value. Default: 127.0.0.1
 		-n  set the number of requests. Default 1000000
 		-P  Pipeline <numreq> requests. Default 1 (no pipeline)
-		-I  Set number of Client instances. Default 64"
+		-I  Set number of Client instances. Default 64
+		-S  Output Result Summary to STDOUT. Default 1
 
 > Results
   -------

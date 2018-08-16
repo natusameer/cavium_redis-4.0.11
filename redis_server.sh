@@ -23,33 +23,17 @@ while getopts ':hI:' option; do
 done
 shift $((OPTIND - 1))
 
-PHY_CPUS=`lscpu | grep ^Core | tr -s ' ' | cut -d" " -f4`; echo ${PHY_CPUS}
+PHY_CPUS=`lscpu | grep ^Core | tr -s ' ' | cut -d" " -f4`;
 SMT=`lscpu | grep Thread | tr -s ' ' | cut -d" " -f4`;
-
-#MODE="DUAL_SOCK"
 DIVISOR=`echo $(($(($SMT*$PHY_CPUS))*2))`
 
-CWD=`pwd`
-
-#Find the Processor ( Intel / ARM ) Architecture
-ARCH=`uname -m`
-if [ "$ARCH" == "x86_64" ];then
-	CLIENT_CORE_OFFSET=`echo $(($SMT*$PHY_CPUS))`
-	MAKE="Intel"
-elif [ "$ARCH" == "aarch64" ]; then
-	CLIENT_CORE_OFFSET=`echo $(($SMT*$(($PHY_CPUS/2))))`
-	MAKE="Saber"
-fi
-
 #For Results, In /tmp/ remove older result files if any
-sudo rm -f /tmp/[0-1]*
 sudo rm -f /tmp/redis_*
-sudo rm -f /tmp/result_*
 
 #Go to Redis Folder
-cd $CWD
-if pgrep redis-server; then
-	sudo killall redis-server;
+echo "Starting $NUMINSTANCES Redis-Server instances"
+if pgrep -c redis-server >> stdout.log; then
+	sudo killall redis-server >> stdout.log;
 	sleep 30
 fi
 
@@ -59,8 +43,8 @@ do
 	let cpu=$((${i}%${DIVISOR}))
 
 	cmd="taskset -c $cpu ./src/redis-server --port $((6379+$i)) --bind ${SERVER_IP} &"
-	echo $cmd
-	eval $cmd
+	eval $cmd >> stdout.log
 done
-
 sleep 5
+echo "$NUMINSTANCES Servers Ready"
+

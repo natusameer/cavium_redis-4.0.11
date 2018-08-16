@@ -43,4 +43,5 @@ while (<>) {
 		$lat99_99_max = $lat99_99[1];
 	}
 }
-print "$operation,$totalrps,$lat50_max,$lat95_max,$lat99_max,$lat99_90_max,$lat99_99_max\n";
+my $rps = sprintf( "%.2fM", $totalrps/1000000 );
+print ("$operation,$rps,$lat50_max,$lat95_max,$lat99_max,$lat99_90_max,$lat99_99_max\n");

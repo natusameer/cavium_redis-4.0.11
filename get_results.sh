@@ -1,8 +1,8 @@
 #!/bin/bash
 
 RESULT_FILE=$1
+
 rm -f $RESULT_FILE
-echo "TESTS, Total Requests/Sec, Latency_50%, Latency_95%, Latency_99%, Latency_99.950%, Latency_99.99%" >> $RESULT_FILE
 grep -h PING_INLINE /tmp/redis_* | ./compute_results.pl >> $RESULT_FILE
 grep -h PING_BULK /tmp/redis_* | ./compute_results.pl >> $RESULT_FILE
 grep -h SET /tmp/redis_* | ./compute_results.pl >> $RESULT_FILE
