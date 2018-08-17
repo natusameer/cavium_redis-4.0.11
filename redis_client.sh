@@ -80,19 +80,24 @@ echo -e "Completed.... Computing Results!\n"
 bash get_results.sh results_${NUMINSTANCES}.csv
 
 #Backup Detailed log files for each instance
-today=`date +%Y-%m-%d.%H:%M:%S`
+today=`date +%Y-%m-%d.%H.%M.%S`
 mkdir log_${NUMINSTANCES}instances_${today}
 mv /tmp/redis_* log_${NUMINSTANCES}instances_${today}/
+cp results_${NUMINSTANCES}.csv log_${NUMINSTANCES}instances_${today}/
 
 
 if [ "$SUMMARY" -eq 1 ]; then
 	#Generate SUMMARY Header
-	cut -d ',' -f1 results_${NUMINSTANCES}.csv | cut -d ' ' -f1 > op
+	cat results_${NUMINSTANCES}.csv | grep -wh "GET" > summary.csv
+	cat results_${NUMINSTANCES}.csv | grep -wh "SET" >> summary.csv
+	cat results_${NUMINSTANCES}.csv | grep -wh "MSET" >> summary.csv
+
+	cut -d ',' -f1 summary.csv | cut -d ' ' -f1 > op
 	printf "%14s\t" > summary.out
 	while read line; do printf "%12s" $line; done < op >> summary.out;
 	echo "" >> summary.out
 
-	cut -d ',' -f2 results_${NUMINSTANCES}.csv | cut -d ' ' -f1 > rps
+	cut -d ',' -f2 summary.csv | cut -d ' ' -f1 > rps
 	printf "%4s instances\t" $NUMINSTANCES >> summary.out
 	while read line; do printf "%12s" $line; done < rps >> summary.out;
 	echo "" >> summary.out

@@ -42,12 +42,17 @@ NUMINSTANCES=64
 
 #Result Summary 
 #Create Header
-cut -d ',' -f1 results_${NUMINSTANCES}.csv | cut -d ' ' -f1 > op
+
+cat results_${NUMINSTANCES}.csv | grep -wh "GET" > summary.csv
+cat results_${NUMINSTANCES}.csv | grep -wh "SET" >> summary.csv
+cat results_${NUMINSTANCES}.csv | grep -wh "MSET" >> summary.csv
+
+cut -d ',' -f1 summary.csv | cut -d ' ' -f1 > op
 printf "%14s\t" > summary.out
 while read line; do printf "%12s" $line; done < op >> summary.out;
 echo "" >> summary.out
 
-cut -d ',' -f2 results_${NUMINSTANCES}.csv | cut -d ' ' -f1 > rps
+cut -d ',' -f2 summary.csv | cut -d ' ' -f1 > rps
 printf "%4s instances\t" $NUMINSTANCES >> summary.out
 while read line; do printf "%12s" $line; done < rps >> summary.out;
 echo "" >> summary.out
@@ -57,14 +62,17 @@ echo 'TESTS, Total Requests/Sec, Latency_50%, Latency_95%, Latency_99%, Latency_
 #Sleep for 10 seconds between 2 tests
 sleep 10
 
-
 ######### Server and Client with 512 Instances #############
 NUMINSTANCES=512
 ./redis_server.sh -I ${NUMINSTANCES}
 ./redis_client.sh -I ${NUMINSTANCES} -n $REQUESTS -P $NUMREQUESTS -s ${SERVER_IP} -S 0
 
 #Result Summary 
-cut -d ',' -f2 results_${NUMINSTANCES}.csv | cut -d ' ' -f1 > rps
+cat results_${NUMINSTANCES}.csv | grep -wh "GET" > summary.csv
+cat results_${NUMINSTANCES}.csv | grep -wh "SET" >> summary.csv
+cat results_${NUMINSTANCES}.csv | grep -wh "MSET" >> summary.csv
+
+cut -d ',' -f2 summary.csv | cut -d ' ' -f1 > rps
 printf "%4s instances\t" $NUMINSTANCES >> summary.out
 while read line; do printf "%12s" $line; done < rps >> summary.out;
 echo "" >> summary.out
@@ -83,4 +91,4 @@ echo -ne "\n For full results see:\n";
 ls results_*.csv 
 
 #Remove Temporary Files
-rm -f op rps
+rm -f op rps summary.csv
