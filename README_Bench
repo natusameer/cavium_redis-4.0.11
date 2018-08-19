@@ -11,7 +11,12 @@ Building Redis
 ---------------
 	$ cd cavium_redis-4.0.11
 	$ make distclean
-	$ make -j
+	$ make
+
+NOTE: 	"make" will compile the code and start bench test with default parameters.
+	Please check other options in Makefile.
+	e.g. make build (To just build the code, and not run test.)
+
 
 Running Redis Benchark Tests
 -----------------------------
@@ -57,7 +62,7 @@ NOTE: If Redis Server and Client has to run on Seperate Machines, then it has to
 	e.g. for 256 Server/Client instances, results will be stored in "results_256.csv"
 
 
-At the end of test, kill the Redis server.
+NOTE: If running the test manually, kill the Redis server at the end of the test.
 	$ sudo killall redis-server
 
 
